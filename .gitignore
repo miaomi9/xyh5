@@ -1,0 +1,22 @@
+node_modules
+*.log
+data/
+
+# 二进制文件(游戏服务器可执行文件)
+*.so
+gameserver
+chargeserver
+gmserver
+worldserver
+operationanalysisserver
+transmitter
+pri.key
+*.key
+*.crt
+
+# 地图备份
+map_bak/
+
+# 临时文件
+*~
+*.bak

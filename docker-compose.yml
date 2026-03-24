@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  xyh5:
+    build: .
+    container_name: xyh5
+    ports:
+      - "8085:80"
+      - "3306:3306"
+      - "8001:8001"
+      - "8002:8002"
+      - "8004:8004"
+      - "10001:10001"
+      - "11001:11001"
+      - "12001:12001"
+    environment:
+      - MYSQL_ROOT_PASSWORD=echeverra
+      - SERVER_IP=你的服务器IP
+    volumes:
+      - ./data:/data
+      - ./server:/home/server
+      - ./www:/www/wwwroot/xy
+    restart: unless-stopped
+    networks:
+      - xyh5-net
+
+networks:
+  xyh5-net:
+    driver: bridge
