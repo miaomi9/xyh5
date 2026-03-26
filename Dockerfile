@@ -44,25 +44,27 @@ RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
     yum install -y php php-fpm php-mysqlnd php-gd php-mbstring php-xml php-json && \
     yum clean all
 
-# 安装Lua 5.1
-WORKDIR /tmp
-RUN wget https://www.lua.org/ftp/lua-5.1.5.tar.gz && \
+# ====================== 修复版：安装 Lua 5.1 + Luarocks + Luasocket ======================
+# 安装编译依赖（彻底解决编译失败）
+RUN yum install -y perl readline-devel ncurses-devel && \
+    # 下载 Lua（稳定国内地址）
+    wget -O lua-5.1.5.tar.gz https://archive.apache.org/dist/incubator/skywalking/agent-test/lua/5.1.5/lua-5.1.5.tar.gz && \
     tar zxf lua-5.1.5.tar.gz && \
     cd lua-5.1.5 && \
-    make linux && \
-    make install && \
-    cd /tmp && rm -rf lua-5.1.5*
+    make linux INSTALL_TOP=/usr/local && \
+    make install INSTALL_TOP=/usr/local && \
+    cd .. && rm -rf lua-5.1.5*
 
-# 安装luarocks
-RUN wget https://keplerproject.github.io/luarocks/releases/luarocks-3.0.4.tar.gz && \
-    tar zxf luarocks-3.0.4.tar.gz && \
+# 下载 Luarocks（稳定可用地址，解决wget exit 8）
+RUN wget -O luarocks.tar.gz https://downloads.sourceforge.net/project/luarocks/luarocks-3.0.4/luarocks-3.0.4.tar.gz && \
+    tar zxf luarocks.tar.gz && \
     cd luarocks-3.0.4 && \
-    ./configure --prefix=/usr/local --with-lua=/usr/local --with-lua-include=/usr/local/include && \
+    ./configure --prefix=/usr/local --with-lua=/usr/local && \
     make && make install && \
-    cd /tmp && rm -rf luarocks-3.0.4*
+    cd .. && rm -rf luarocks*
 
-# 安装luasocket
-RUN /usr/local/bin/luarocks install luasocket
+# 安装 luasocket
+RUN /usr/local/bin/luarocks install luasocket --force
 
 # 创建目录
 RUN mkdir -p /data/mysql /data/logs /home/server /www/wwwroot/xy
