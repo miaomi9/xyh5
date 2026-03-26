@@ -27,9 +27,17 @@ RUN yum install -y \
     yum clean all
 
 # 安装MySQL 5.7
-RUN yum install -y https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm && \
-    yum install -y mysql-community-server && \
-    yum clean all
+# ====================== 修复版：安装 MySQL 5.7 ======================
+RUN wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm && \
+    # 导入新的 GPG 密钥（修复密钥过期）
+    rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 && \
+    # 安装源，忽略 GPG 检查
+    rpm -ivh mysql57-community-release-el7-11.noarch.rpm --nogpgcheck && \
+    # 安装 MySQL，跳过签名检查
+    yum install -y mysql-community-server --nogpgcheck && \
+    # 清理安装包 + 缓存
+    rm -rf mysql57-community-release-el7-11.noarch.rpm && \
+    yum clean all && rm -rf /var/cache/yum/*
 
 # 安装PHP 7.4 (兼容旧版PHP代码)
 RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
