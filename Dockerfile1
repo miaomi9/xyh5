@@ -1,0 +1,56 @@
+FROM centos:7.9.2009
+
+LABEL maintainer="xyh5"
+LABEL description="梦幻西游H5游戏服务器"
+
+# ====================== 永久修复 CentOS7 YUM 源失效问题 ======================
+RUN mkdir -p /etc/yum.repos.d/bak && \
+    mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/bak/ && \
+    # 写入阿里云 Vault 归档源（稳定可用）
+    echo -e "[base]
+name=CentOS-7 - Base
+baseurl=https://mirrors.aliyun.com/centos-vault/7.9.2009/os/x86_64/
+gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/centos-vault/RPM-GPG-KEY-CentOS-7
+enabled=1
+
+[updates]
+name=CentOS-7 - Updates
+baseurl=https://mirrors.aliyun.com/centos-vault/7.9.2009/updates/x86_64/
+gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/centos-vault/RPM-GPG-KEY-CentOS-7
+enabled=1
+
+[extras]
+name=CentOS-7 - Extras
+baseurl=https://mirrors.aliyun.com/centos-vault/7.9.2009/extras/x86_64/
+gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/centos-vault/RPM-GPG-KEY-CentOS-7
+enabled=1" > /etc/yum.repos.d/CentOS-Vault.repo && \
+    # 修复 EPEL 源（解决 nginx/supervisor 安装）
+    yum install -y https://archives.fedoraproject.org/pub/archive/epel/epel-release-latest-7.noarch.rpm && \
+    sed -i 's|^metalink=|#metalink=|g' /etc/yum.repos.d/epel*.repo && \
+    sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://archives.fedoraproject.org/pub/archive|g' /etc/yum.repos.d/epel*.repo && \
+    # 重建缓存
+    yum clean all && yum makecache fast
+
+# ====================== 下方是你原本的安装命令（无需修改） ======================
+# 安装基础软件
+RUN yum install -y \
+    wget \
+    gcc \
+    gcc-c++ \
+    make \
+    glibc-devel \
+    readline-devel \
+    ncurses-devel \
+    openssl-devel \
+    libxml2 \
+    libxml2-devel \
+    libxslt \
+    libxslt-devel \
+    nginx \
+    epel-release && \
+    yum install -y supervisor && \
+    yum clean all
+    
