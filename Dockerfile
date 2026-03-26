@@ -44,18 +44,11 @@ RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
     yum install -y php php-fpm php-mysqlnd php-gd php-mbstring php-xml php-json && \
     yum clean all
 
-# ====================== 绝杀版：YUM 直接安装 Lua 5.1（无下载、无编译） ======================
-RUN yum install -y lua lua-devel luarocks && \
+# ====================== 彻底无下载：YUM 一键安装 Lua + Luarocks ======================
+RUN yum install -y epel-release && \
+    yum install -y lua lua-devel luarocks && \
     luarocks install luasocket && \
     yum clean all
-
-# 下载 Luarocks（稳定可用地址，解决wget exit 8）
-RUN wget -O luarocks.tar.gz https://downloads.sourceforge.net/project/luarocks/luarocks-3.0.4/luarocks-3.0.4.tar.gz && \
-    tar zxf luarocks.tar.gz && \
-    cd luarocks-3.0.4 && \
-    ./configure --prefix=/usr/local --with-lua=/usr/local && \
-    make && make install && \
-    cd .. && rm -rf luarocks*
 
 # 安装 luasocket
 RUN /usr/local/bin/luarocks install luasocket --force
