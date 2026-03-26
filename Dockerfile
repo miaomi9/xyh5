@@ -50,9 +50,6 @@ RUN yum install -y epel-release && \
     luarocks install luasocket && \
     yum clean all
 
-# 安装 luasocket
-RUN /usr/local/bin/luarocks install luasocket --force
-
 # 创建目录
 RUN mkdir -p /data/mysql /data/logs /home/server /www/wwwroot/xy
 
