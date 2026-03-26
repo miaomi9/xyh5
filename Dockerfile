@@ -1,9 +1,13 @@
 FROM centos:7.9.2009
-
 LABEL maintainer="xyh5"
 LABEL description="梦幻西游H5游戏服务器"
 
-# 安装基础软件
+# ------------ 一键修复 CentOS7 失效源（解决 mirrorlist 报错）------------
+RUN sed -i 's|mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-*.repo && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=https://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo && \
+    yum clean all && yum makecache
+
+# 下面是你原来的安装命令，无需修改
 RUN yum install -y \
     wget \
     gcc \
@@ -18,8 +22,8 @@ RUN yum install -y \
     libxslt \
     libxslt-devel \
     nginx \
-    epel-release && \
-    yum install -y supervisor && \
+    epel-release \
+    supervisor && \
     yum clean all
 
 # 安装MySQL 5.7
