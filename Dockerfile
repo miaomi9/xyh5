@@ -27,19 +27,15 @@ RUN yum install -y \
     yum clean all
 
 # 安装MySQL 5.7
-# ====================== 终极修复：MySQL 5.7 安装（GitHub Actions 专用） ======================
-RUN yum install -y ca-certificates openssl && \  # 解决SSL证书问题（关键！）
+# 终极修复：MySQL 5.7 安装（无语法错误版）
+RUN yum install -y ca-certificates openssl && \
     update-ca-trust && \
-    # 用国内高速地址下载 MySQL 源（避免官方网络失败）
     wget -O mysql57.rpm http://repo.mysql.com/mysql57-community-release-el7-11.noarch.rpm && \
     rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 && \
     rpm -Uvh mysql57.rpm --nodeps --force && \
-    # 关闭 GPG 检查，避免签名报错
     sed -i 's|gpgcheck=1|gpgcheck=0|g' /etc/yum.repos.d/mysql-community.repo && \
-    # 安装 MySQL
     yum install -y mysql-community-server --skip-broken --nogpgcheck && \
-    # 清理垃圾
-    rm -f mysql57.rpm && yum clean all && rm -rf /var/cache/yum/*
+    rm -f mysql57.rpm && yum clean all
 
 # 安装PHP 7.4 (兼容旧版PHP代码)
 RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
